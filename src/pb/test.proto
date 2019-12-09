@@ -37,9 +37,9 @@ message HashCheckResult {
 message FeatureHashParams {
     string imsi = 1;
     string static_ip = 2;
-    HssProfile profile = 3;
-    string imei = 4;
-    string qos_profile_name = 5;
+    string imei = 3;
+    string qos_profile_name = 4;
+    HssProfile profile = 5;
 }
 
 enum HssProfile {

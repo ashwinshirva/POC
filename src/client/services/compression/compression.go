@@ -11,12 +11,8 @@ import (
 	pb "pb"
 	"github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc/codes"
+	"constants"
 )
-
-const (
-	address     = "localhost:50051"
-)
-
 
 var (
 	InterceptorOpts = []grpc_retry.CallOption{
@@ -54,7 +50,7 @@ func createClient() (pb.GreeterClient, *grpc.ClientConn) {
 }
 
 func createConnection() *grpc.ClientConn {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
+	conn, err := grpc.Dial(constants.Address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

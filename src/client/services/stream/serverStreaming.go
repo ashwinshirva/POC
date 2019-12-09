@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"constants"
 
 	_ "google.golang.org/grpc/encoding/gzip"
 	pb "pb"
@@ -13,10 +14,6 @@ import (
 	"unsafe"
 	"github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc/codes"
-)
-
-const (
-	address     = "localhost:50051"
 )
 
 
@@ -73,7 +70,7 @@ func createClient() (pb.GreeterClient, *grpc.ClientConn) {
 }
 
 func createConnection() *grpc.ClientConn {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
+	conn, err := grpc.Dial(constants.Address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

@@ -61,25 +61,23 @@ func (s *server) NoStreaming(ctx context.Context, in *pb.HelloRequest) (*pb.Hash
 	log.Printf("Received: %v", in.GetName())
 
 
-	respFinal := pb.HashCheckResult{}
 	featureParamsList := make([]*pb.FeatureHashParams, 0, 1)
 	imsiList := make([]string, 0, 1)
 
-	epc := pb.Epc{HwId:"00:07:32:42:70:B3", Identifier:"blrsyvegreenui@nokia.com::804f7318-79ce-4f3b-b227-56b2b7a5597b", }
-	for i:=0; i<5000000; i++ {
-		hashCheckParams := pb.FeatureHashParams{Imsi:strconv.Itoa(i), StaticIp:"10.1.1.1", Imei:strconv.Itoa(i), Profile:pb.HssProfile_Default, QosProfileName:"test_name"}
-		resp := &pb.HashCheckResult{Imsi: []string{strconv.Itoa(i)}, FeatureParams:[]*pb.FeatureHashParams{&hashCheckParams}, Result:true, Epc:&epc}
+	epc := &pb.Epc{HwId:"00:07:32:42:70:B3", Identifier:"blrsyvegreenui@nokia.com::804f7318-79ce-4f3b-b227-56b2b7a5597b", }
+	hashCheckParams := &pb.FeatureHashParams{Imsi:"111111111111111", StaticIp:"10.1.1.1", Imei:"111111111111111", Profile:pb.HssProfile_Default, QosProfileName:"test_name"}
+	resp := &pb.HashCheckResult{Result:true}
 
-		featureParams := resp.GetFeatureParams()
-		imsi := resp.GetImsi()
-		featureParamsList = append(featureParamsList, featureParams...)
-		imsiList = append(imsiList, imsi...)
+	for i:=0; i<1000000; i++ {
+		featureParamsList = append(featureParamsList, hashCheckParams)
+		imsiList = append(imsiList, "111111111111111")
 	}
 
-	respFinal.FeatureParams = featureParamsList
-	respFinal.Imsi = imsiList
+	resp.FeatureParams = featureParamsList
+	resp.Imsi = imsiList
+	resp.Epc = epc
 
-	return &respFinal, nil
+	return resp, nil
 }
 
 func (s *server) ServerCompression(ctx context.Context, in *pb.HelloRequest) (*pb.HashCheckResult, error) {
@@ -91,19 +89,17 @@ func (s *server) ServerCompression(ctx context.Context, in *pb.HelloRequest) (*p
 	imsiList := make([]string, 0, 1)
 
 	epc := &pb.Epc{HwId:"00:07:32:42:70:B3", Identifier:"blrsyvegreenui@nokia.com::804f7318-79ce-4f3b-b227-56b2b7a5597b"}
-	for i:=0; i<1000000; i++ {
-		hashCheckParams := pb.FeatureHashParams{Imsi:strconv.Itoa(i), StaticIp:"10.1.1.1", Imei:strconv.Itoa(i), Profile:pb.HssProfile_Default, QosProfileName:"test_name"}
-		resp := &pb.HashCheckResult{Imsi: []string{strconv.Itoa(i)}, FeatureParams:[]*pb.FeatureHashParams{&hashCheckParams}, Result:true}
+	resp := &pb.HashCheckResult{Result:true}
+	hashCheckParams := &pb.FeatureHashParams{Imsi:"111111111111111", StaticIp:"10.1.1.1", Imei:"111111111111111", Profile:pb.HssProfile_Default, QosProfileName:"test_name"}
 
-		featureParams := resp.GetFeatureParams()
-		imsi := resp.GetImsi()
-		featureParamsList = append(featureParamsList, featureParams...)
-		imsiList = append(imsiList, imsi...)
+	for i:=0; i<10; i++ {
+		featureParamsList = append(featureParamsList, hashCheckParams)
+		imsiList = append(imsiList, "111111111111111")
 	}
 
-	respFinal.FeatureParams = featureParamsList
-	respFinal.Imsi = imsiList
-	respFinal.Epc = epc
+	resp.FeatureParams = featureParamsList
+	resp.Imsi = imsiList
+	resp.Epc = epc
 
 	//gzip.SetLevel(10)
 

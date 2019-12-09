@@ -1,7 +1,5 @@
 package constants
 
 const (
-
-Test ="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-
+	Address = "localhost:50051"
 )

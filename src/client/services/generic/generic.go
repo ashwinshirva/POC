@@ -12,10 +12,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc/codes"
 	"unsafe"
-)
-
-const (
-	address     = "localhost:50051"
+	"constants"
 )
 
 
@@ -41,7 +38,7 @@ func CallNoStream() {
 		log.Fatalf("could not greet: %v", err0)
 	}
 
-	log.Println("Success Non Streaming")
+	log.Println("Success Non Streaming: ", respFinal2)
 }
 
 
@@ -53,7 +50,7 @@ func createClient() (pb.GreeterClient, *grpc.ClientConn) {
 }
 
 func createConnection() *grpc.ClientConn {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
+	conn, err := grpc.Dial(constants.Address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(InterceptorOpts...)))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
