@@ -1,4 +1,4 @@
 # Running Benchmark Files
 
-1. Go to respective service folder.
-2. go test -bench=.
+1. Navigate to /poc/build/
+2. Run "make all"
