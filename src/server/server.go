@@ -1,14 +1,15 @@
 package main
 
 import (
-	"log"
 	"context"
 
 	_ "google.golang.org/grpc/encoding/gzip"
 	pb "pb"
-	"strconv"
 	"net"
 	"google.golang.org/grpc"
+	"encoding/binary"
+	"common/helpers"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -20,9 +21,9 @@ type server struct {
 	pb.GreeterServer
 }
 
-// SayHello implements helloworld.GreeterServer
 func (s *server) SayHello(in *pb.HelloRequest, stream pb.Greeter_SayHelloServer) error {
-	log.Printf("Received: %v", in.GetName())
+	log.Info("Server: Streaming rpc called...")
+
 
 
 
@@ -34,10 +35,9 @@ func (s *server) SayHello(in *pb.HelloRequest, stream pb.Greeter_SayHelloServer)
 
 	for i:=0; i<1000000; i++ {
 		resp := &pb.HashCheckResult{Result:true, Epc:&epc}
-		imsi := strconv.Itoa(i)
 
 		featureParamsList = append(featureParamsList, hashCheckParams)
-		imsiList = append(imsiList, imsi)
+		imsiList = append(imsiList, "111111111111111")
 
 		if i % 50000 == 0 {
 			resp.FeatureParams = featureParamsList
@@ -58,7 +58,7 @@ func (s *server) SayHello(in *pb.HelloRequest, stream pb.Greeter_SayHelloServer)
 }
 
 func (s *server) NoStreaming(ctx context.Context, in *pb.HelloRequest) (*pb.HashCheckResult, error) {
-	log.Printf("Received: %v", in.GetName())
+	log.Info("Server: Generic rpc called...")
 
 
 	featureParamsList := make([]*pb.FeatureHashParams, 0, 1)
@@ -77,14 +77,21 @@ func (s *server) NoStreaming(ctx context.Context, in *pb.HelloRequest) (*pb.Hash
 	resp.Imsi = imsiList
 	resp.Epc = epc
 
+
+	buff, err := helpers.ConvertStructToBytes(resp)
+	if err != nil {
+		return &pb.HashCheckResult{}, err
+	}
+	log.Println("No Streaming rpc Response Size: ", binary.Size(buff.Bytes()))
+
+
 	return resp, nil
 }
 
 func (s *server) ServerCompression(ctx context.Context, in *pb.HelloRequest) (*pb.HashCheckResult, error) {
-	log.Printf("Received: %v", in.GetName())
+	log.Info("Server: Compression rpc called...")
 
 
-	respFinal := pb.HashCheckResult{}
 	featureParamsList := make([]*pb.FeatureHashParams, 0, 1)
 	imsiList := make([]string, 0, 1)
 
@@ -92,7 +99,7 @@ func (s *server) ServerCompression(ctx context.Context, in *pb.HelloRequest) (*p
 	resp := &pb.HashCheckResult{Result:true}
 	hashCheckParams := &pb.FeatureHashParams{Imsi:"111111111111111", StaticIp:"10.1.1.1", Imei:"111111111111111", Profile:pb.HssProfile_Default, QosProfileName:"test_name"}
 
-	for i:=0; i<10; i++ {
+	for i:=0; i<1000000; i++ {
 		featureParamsList = append(featureParamsList, hashCheckParams)
 		imsiList = append(imsiList, "111111111111111")
 	}
@@ -103,7 +110,10 @@ func (s *server) ServerCompression(ctx context.Context, in *pb.HelloRequest) (*p
 
 	//gzip.SetLevel(10)
 
-	return &respFinal, nil
+	buff, _ := helpers.ConvertStructToBytes(resp)
+	log.Println("Server: Compression rpc Response Size: ", binary.Size(buff.Bytes()))
+
+	return resp, nil
 }
 
 

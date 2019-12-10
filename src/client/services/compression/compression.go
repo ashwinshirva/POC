@@ -30,15 +30,11 @@ func CallCompression() {
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	t1 := time.Now()
 	_, err0 := client.ServerCompression(ctx, &pb.HelloRequest{Name: "test"}, grpc.UseCompressor("gzip"))
 	if err0 != nil {
-		t2 := time.Now()
-		log.Println("Time taken Streaming: ", t2.Sub(t1))
 		log.Fatalf("could not greet: %v", err0)
 	}
-
-	log.Println("Success Non Streaming: ")
+	log.Println("Success Compression: ")
 }
 
 

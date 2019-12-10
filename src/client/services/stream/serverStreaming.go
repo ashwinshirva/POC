@@ -11,9 +11,10 @@ import (
 	_ "google.golang.org/grpc/encoding/gzip"
 	pb "pb"
 	"io"
-	"unsafe"
 	"github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc/codes"
+	"encoding/binary"
+	"common/helpers"
 )
 
 
@@ -30,7 +31,6 @@ func CallStreaming() {
 	client, conn := createClient()
 	defer conn.Close()
 
-	t1 := time.Now()
 	serverResp, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: "test"}, grpc.UseCompressor("gzip"))
 
 	respFinal := pb.HashCheckResult{}
@@ -45,6 +45,9 @@ func CallStreaming() {
 
 		featureParamsList = append(featureParamsList, resp.GetFeatureParams()...)
 		imsiList = append(imsiList, resp.GetImsi()...)
+
+		buff, err := helpers.ConvertStructToBytes(resp)
+		log.Println("Streaming rpc Response Chunk Size: ", binary.Size(buff.Bytes()))
 	}
 
 	if err != nil {
@@ -54,10 +57,8 @@ func CallStreaming() {
 	respFinal.FeatureParams = featureParamsList
 	respFinal.Imsi = imsiList
 
-	t2 := time.Now()
-
-	log.Println("Size of Response: ", unsafe.Sizeof(respFinal))
-	log.Println("Time taken Streaming: ", t2.Sub(t1))
+	buff, err := helpers.ConvertStructToBytes(respFinal)
+	log.Println("Streaming rpc Response Size: ", binary.Size(buff.Bytes()))
 	log.Println("Success Streaming")
 }
 
